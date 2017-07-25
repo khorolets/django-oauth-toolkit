@@ -33,7 +33,10 @@ class TokenHasScope(BasePermission):
 
     def get_scopes(self, request, view):
         try:
-            return getattr(view, "required_scopes")
+            scopes = getattr(view, "required_scopes")
+            if hasattr(view, "%s_required_scopes" % request.method.lower()):
+                scopes += getattr(view, "%s_required_scopes" % request.method.lower())
+            return scopes
         except AttributeError:
             raise ImproperlyConfigured(
                 "TokenHasScope requires the view to define the required_scopes attribute"
